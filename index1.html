@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="stylee.css"> 
+  <title>Հողատարածք</title>
+</head>
+<body>
+  <p class="forP">Հողակտորի կառուցվածքները որպես երկրաչափական պատկերներ՝ ըստ ներմուծված հաստատուն պարագծի</p>
+  <div class="all">
+    <!-- Քառակուսի -->
+    <div id="squareWrapper" class="shape" >
+      <div id="square"></div>
+      <pre id="squareInfo"></pre>
+    </div>
+    <!-- Շրջան -->
+    <div id="circleWrapper" class="shape">
+      <div id="circle"></div>
+      <pre id="circleInfo"></pre>
+    </div>
+    <!-- Եռանկյուն -->
+    <div id="triangleWrapper" class="shape">
+      <div id="trianglee"></div>
+      <pre id="triangleInfo"></pre>
+    </div>
+  </div> 
+  <div class="buttons">
+    <button class="button" onclick="Previous()">Հետ գնալ նախորդ էջ</button>
+    <button class="button" onclick="myFunction()">Լավագույն ծածկողականությամբ տեսակ</button>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const cmPerimeter = parseFloat(urlParams.get('perimeter'));
+    const cmArea = parseFloat(urlParams.get('area'));
+    if (cmPerimeter && cmArea) {
+      // Քառակուսի
+      const squareSide = cmPerimeter / 4;
+      $('#square').css({
+        width: squareSide + 'cm',
+        height: squareSide + 'cm'
+      });
+      $('#squareInfo').text(`Քառակուսի\nԿողմ՝ ${squareSide.toFixed(2)} սմ\nՄակերես՝ ${(squareSide ** 2).toFixed(2)} սմ²`);
+      $('#squareWrapper').show();
+      sessionStorage.setItem("squareSide", squareSide);
+      sessionStorage.setItem("squareArea", (squareSide ** 2));
+
+      // Շրջան
+      const radius = cmPerimeter / (2 * Math.PI);
+      const diameter = radius * 2;
+      $('#circle').css({
+        width: diameter + 'cm',
+        height: diameter + 'cm'
+      });
+      const circleArea = Math.PI * radius ** 2;
+      $('#circleInfo').text(`Շրջան\nՇառավիղ՝ ${radius.toFixed(2)} սմ\nՄակերես՝ ${circleArea.toFixed(2)} սմ²`);
+      $('#circleWrapper').show();
+      sessionStorage.setItem("circleRadius", radius);
+      sessionStorage.setItem("circleArea", circleArea);
+
+      //Հավասարակողմ եռանկյուն
+      const triangleSide = cmPerimeter / 3;
+      const triangleHeight = (Math.sqrt(3) / 2) * triangleSide;
+      const triangleArea = (triangleSide * triangleHeight) / 2;
+      $('#trianglee').css({
+        borderLeft: (triangleSide / 2) + 'cm solid transparent',
+        borderRight: (triangleSide / 2) + 'cm solid transparent',
+        borderBottom: triangleHeight + 'cm solid rgb(116, 85, 85)'
+      });
+      $('#triangleInfo').text(
+        `Հավասարակողմ եռանկյուն\nԱմենամեծ մակերես ունեցողը նույն պարագծով եռանկյունների մեջ\nԿողմ՝ ${triangleSide.toFixed(2)} սմ\nԲարձրություն՝${triangleHeight.toFixed(2)} սմ\nՄակերես՝ ${triangleArea.toFixed(2)} սմ²`
+      );
+      $('#triangleWrapper').show();
+      sessionStorage.setItem("triangleSide", triangleSide); 
+      sessionStorage.setItem("triangleHeight", triangleHeight); 
+      sessionStorage.setItem("triangleArea", triangleArea );
+
+      const shapes = [
+        { name: "քառակուսի", area: squareSide ** 2 },
+        { name: "շրջան", area: circleArea },
+        { name: "եռանկյուն", area: triangleArea }
+      ];
+      shapes.sort((a, b) => b.area - a.area);
+      const topShape = shapes[0];
+      const resultDiv = $('<pre></pre>')
+        .addClass('result-summary')
+        .text(`Նույն պարագծով առավելագույն մակերես ունեցող պատկեր՝ ${topShape.name} — ${topShape.area.toFixed(2)} սմ²`);
+
+      $('.all').after(resultDiv);
+      const shapeIdMap = {
+        "քառակուսի": "#squareWrapper",
+        "շրջան": "#circleWrapper",
+        "եռանկյուն": "#triangleWrapper"
+      };
+      $(shapeIdMap[topShape.name]).addClass('highlight-shape');
+    }
+    function Previous() {
+      window.history.back();   
+    }
+    function myFunction() {
+      const params = new URLSearchParams(window.location.search);
+      const perimeter = params.get("perimeter");
+      const area = params.get("area");
+      window.location.href = `index2.html?perimeter=${encodeURIComponent(perimeter)}&area=${encodeURIComponent(area)}`;
+    }
+  </script>
+</body>
+</html>
+
+
+
+        

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="stylee.css"> 
+  <title>Հողատարածքի կառուցվածքի առաջարկներ</title>
+</head>
+<body>
+    <button class="button1" onclick="Previous()">Հետ գնալ նախորդ էջ</button>
+    <div class="itIsText">
+        <h1>Հողատարածքի պատկերում՝ օգտագործելով հողակտորի երեք կառուցվածքները և ծածկողականության արդյունքների ցուցադրում</h1>
+    </div>
+    <div class="lands">  
+        <div id="land"></div>
+        <div id="land1"></div>
+        <div id="land2"></div>
+        <p id="result"></p>
+    </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+  $(document).ready(function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const cmArea = parseFloat(urlParams.get('area'));
+    const squareSide = parseFloat(sessionStorage.getItem("squareSide")); 
+    const circleRadius = parseFloat(sessionStorage.getItem("circleRadius"));
+    const triBase = parseFloat(sessionStorage.getItem("triangleSide"));
+    const triHeight = parseFloat(sessionStorage.getItem("triangleHeight"));
+    const triArea = parseFloat(sessionStorage.getItem("triangleArea"));
+    function Previous() {
+      window.history.back();
+    }
+    $(".button1").on("click", Previous);
+    if (!cmArea || isNaN(cmArea)) {
+      $("body").html("<p>Տվյալները բացակայում են կամ սխալ են։</p>");
+      return;
+    }
+    const landSide = Math.sqrt(cmArea);
+    const $landDiv = $("#land").css({ width: landSide + "cm", height: landSide + "cm" });
+    const $landDiv1 = $("#land1").css({ width: landSide + "cm", height: landSide + "cm" });
+    const $landDiv2 = $("#land2").css({ width: landSide + "cm", height: landSide + "cm" });
+    let squareCount = circleCount = triangleCount = squareAreaTotal = circleAreaTotal = triangleAreaTotal = maxCoverage = 0, bestShape = "";
+
+    // Քառակուսիներ
+    const squareCols = Math.floor(landSide / squareSide);
+    const squareRows = Math.floor(landSide / squareSide);
+    const maxSquares = squareCols * squareRows;
+    for (let i = 0; i < maxSquares; i++) {
+      const row = Math.floor(i / squareCols);
+      const col = i % squareCols;
+      $("<div>")
+        .addClass("square")
+        .css({
+          width: squareSide + "cm",
+          height: squareSide + "cm",
+          left: col * squareSide + "cm",
+          top: row * squareSide + "cm",
+          position: "absolute"
+        })
+        .appendTo($landDiv);
+      squareCount++;
+      squareAreaTotal += squareSide * squareSide;
+    }
+
+    // Շրջաններ
+    const circleDiameter = circleRadius * 2;
+    const circleCols = Math.floor(landSide / circleDiameter);
+    const circleRows = Math.floor(landSide / circleDiameter);
+    const maxCircles = circleCols * circleRows;
+    for (let i = 0; i < maxCircles; i++) {
+      const row = Math.floor(i / circleCols);
+      const col = i % circleCols;
+      $("<div>")
+        .addClass("circle")
+        .css({
+          width: circleDiameter + "cm",
+          height: circleDiameter + "cm",
+          left: col * circleDiameter + "cm",
+          top: row * circleDiameter + "cm",
+          position: "absolute"
+        })
+        .appendTo($landDiv1);
+      circleCount++;
+      circleAreaTotal += Math.PI * circleRadius * circleRadius;
+    }
+
+    // Եռանկյուններ
+    const land = document.getElementById("land2");
+    land.style.width = `${landSide}cm`;
+    land.style.height = `${landSide}cm`;
+    const cols = Math.ceil(landSide / (triBase / 2));
+    const rows = Math.ceil(landSide / triHeight);
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < cols; col++) {
+        const isUpsideDown = col % 2 === 1;
+        const x = col * triBase / 2;
+        const y = row * triHeight;
+        if (x + triBase > landSide || y + triHeight > landSide) continue;
+        const triangle = document.createElement("div");
+        triangle.classList.add("triangle");
+        if (isUpsideDown) triangle.classList.add("upside-down");
+        triangle.style.left = `${x}cm`;
+        triangle.style.top = `${y}cm`;
+        triangle.style.width = `${triBase}cm`;
+        triangle.style.height = `${triHeight}cm`;
+        land.appendChild(triangle);
+        triangleCount++;
+        triangleAreaTotal = triangleCount * triArea;
+      }
+    }
+
+    const squareCoverage = (squareAreaTotal / cmArea) * 100;
+    const circleCoverage = (circleAreaTotal / cmArea) * 100;
+    const triangleCoverage = (triangleAreaTotal / cmArea) * 100;
+    if (squareCoverage > maxCoverage) {
+      maxCoverage = squareCoverage;
+      bestShape = "քառակուսի";
+    }
+    if (circleCoverage > maxCoverage) {
+      maxCoverage = circleCoverage;
+      bestShape = "շրջան";
+    }
+    if (triangleCoverage > maxCoverage) {
+      maxCoverage = triangleCoverage;
+      bestShape = "եռանկյուն";
+    }
+    const resultText = `
+      <strong>Արդյունքներ</strong><br><br>
+      <strong>Ամենաբարձր ծածկողականություն ունեցող պատկերը՝ ${bestShape}</strong><br><br>
+      Հողատարածք՝ ${cmArea} սմ²<br><br>
+      Քառակուսի՝ ${squareCount} հատ<br>
+      Զբաղեցված մակերես՝ ${squareAreaTotal.toFixed(2)} սմ²<br>
+      <strong>Ծածկողականություն՝ ${squareCoverage.toFixed(2)}%</strong><br><br>
+      Շրջան՝ ${circleCount} հատ<br>
+      Զբաղեցված մակերես՝ ${circleAreaTotal.toFixed(2)} սմ²<br>
+      <strong>Ծածկողականություն՝ ${circleCoverage.toFixed(2)}%</strong><br><br>
+      Եռանկյուն՝ ${triangleCount} հատ<br>
+      Զբաղեցված մակերես՝ ${triangleAreaTotal.toFixed(2)} սմ²<br>
+      <strong>Ծածկողականություն՝ ${triangleCoverage.toFixed(2)}%</strong><br><br>
+    `;
+    $("#result").html(resultText);
+  });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

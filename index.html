@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="stylee.css">
+  <title>Հողատարածք</title>
+</head>
+<body>
+  <p class="startP">Հողակտորի կառուցվածքի առաջարկներ</p>
+  <form id="myForm" action="index1.html">
+    <div>
+      <label for name = "input1">Ներմուծիր հողակտորների հաստատուն պարագիծը (սմ)</label> 
+      <input type="number" id="perimeterInput" name = "input1">
+    </div>
+    <div class="land">
+      <label for name = "input2">Ներմուծիր հողատարածքի մակերեսը (սմ²)</label> 
+      <input type="number" id="landAreaInput" name = "input2" >
+    </div>
+    <input type="submit" value="Արդյունք" class="button">
+  </form>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    $('#myForm').on('submit', function (event) {
+      event.preventDefault(); 
+      const perimeter = $('#perimeterInput').val();
+      const landArea = $('#landAreaInput').val();
+      if (!perimeter || !landArea || perimeter <= 0 || landArea <= 0 ) {
+        alert("Խնդրում եմ լրացրու բոլոր դաշտերը (>0)։");
+      } else {
+        const url = `index1.html?perimeter=${encodeURIComponent(perimeter)}&area=${encodeURIComponent(landArea)}`;
+        window.location.href = url; 
+      }
+    });
+  </script>  
+</body>
+</html>
+
+
+
