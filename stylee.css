@@ -149,6 +149,7 @@ pre {
 .circle {
   background-color:  rgb(116, 85, 85);
   border-radius: 50%;
+  position: "absolute",
 }
 
 .itIsText{

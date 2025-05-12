@@ -64,20 +64,49 @@
 
     // Շրջաններ
     const circleDiameter = circleRadius * 2;
-    const circleCols = Math.floor(landSide / circleDiameter);
-    const circleRows = Math.floor(landSide / circleDiameter);
-    const maxCircles = circleCols * circleRows;
-    for (let i = 0; i < maxCircles; i++) {
-      const row = Math.floor(i / circleCols);
-      const col = i % circleCols;
+    const rowHeight = circleDiameter * 0.866; // ≈ sqrt(3)/2 * diameter
+
+    //"hexagonal" դասավորություն
+    const hexCols = Math.ceil(landSide / circleDiameter) + 1;
+    const hexRows = Math.ceil(landSide / rowHeight) + 1;
+    let hexPositions = [];
+    for (let row = 0; row < hexRows; row++) {
+      for (let col = 0; col < hexCols; col++) {
+        const offsetX = (row % 2 === 0) ? 0 : circleRadius;
+        const x = col * circleDiameter + offsetX;
+        const y = row * rowHeight;
+        if (x + circleDiameter <= landSide && y + circleDiameter <= landSide) {
+          hexPositions.push({ x, y });
+        }
+      }
+    }
+    const hexCount = hexPositions.length;
+
+    //"grid" դասավորություն
+    const gridCols = Math.floor(landSide / circleDiameter);
+    const gridRows = Math.floor(landSide / circleDiameter);
+    const gridCount = gridCols * gridRows;
+    let gridPositions = [];
+    for (let i = 0; i < gridCount; i++) {
+      const row = Math.floor(i / gridCols);
+      const col = i % gridCols;
+      const x = col * circleDiameter;
+      const y = row * circleDiameter;
+      gridPositions.push({ x, y });
+    }
+
+    console.log("Hexagonal count:", hexCount);
+    console.log("Grid count:", gridCount);
+    const finalPositions = hexCount >= gridCount ? hexPositions : gridPositions;
+    console.log("Ընտրված ալգորիթմի շրջանների քանակը՝", finalPositions.length);
+    for (const pos of finalPositions) {
       $("<div>")
         .addClass("circle")
         .css({
           width: circleDiameter + "cm",
           height: circleDiameter + "cm",
-          left: col * circleDiameter + "cm",
-          top: row * circleDiameter + "cm",
-          position: "absolute"
+          left: pos.x + "cm",
+          top: pos.y + "cm",
         })
         .appendTo($landDiv1);
       circleCount++;
